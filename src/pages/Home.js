@@ -1,15 +1,17 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Slider from '../components/home/Slider'
 import Brand from '../components/home/Brand'
 import '../assets/css/home.scss';
 import { Button } from 'reactstrap';
 import HomeModal from '../components/home/HomeModal';
+import axios from 'axios';
 
 function Home() {
     const [count, setCount] = useState(0);
     const [isOpen, setIsOpen] = useState(false);
+    const [employees, setEmployees] = useState([{}])
 
-    const employees = ["Ismayil Efendizade","Fidan Bashirova", "Kubra Memmedova","Huseyn Huseynov", "Pervin Mirzeyev", "Aydemir Resulov"]
+   // const employees = ["Ismayil Efendizade", "Fidan Bashirova", "Kubra Memmedova", "Huseyn Huseynov", "Pervin Mirzeyev", "Aydemir Resulov"]
 
     function increment(elem) {
         if (parseInt(elem.previousElementSibling.innerText) === 10) {
@@ -29,7 +31,14 @@ function Home() {
         setIsOpen(true);
     }
 
-    
+    useEffect(() => {
+        axios.get(`https://localhost:7259/api/Employee/GetAll`)
+            .then(res => {
+                const emps = res.data;
+                setEmployees(emps);
+            })
+    });
+
 
     return (
         <div className='container mt-2'>
@@ -41,18 +50,17 @@ function Home() {
 
             <ul className="list-group mt-4">
                 {
-                    employees.map(function(emp){
-                        return <li className="list-group-item">{emp}</li>
+                    employees.map(function (emp) {
+                        return <li key={emp.id} className="list-group-item">{emp.fullName} + {emp.address} + {emp.age}</li>
                     })
-                  
                 }
-                
-               
+
+
             </ul>
 
             <HomeModal setIsOpen={setIsOpen} isOpen={isOpen} />
 
-            <Button onClick={() => showModal()} color='success' className='mt-5'>Show modal</Button>
+            <Button onClick={() => showModal()} color='success' className='mt-5'>New employee</Button>
 
         </div>
     )
